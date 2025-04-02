@@ -403,7 +403,7 @@ export class UserRouter {
 import { createTRPCReact } from '@trpc/react-query';
 import type { AppRouter } from '../server/router';
 
-export const trpc = createTRPCReact<AppRouter>();
+export const trpc = createTRPCReact&lt;AppRouter&gt;();
 
 // UserList.tsx
 function UserList() {
