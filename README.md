@@ -1,6 +1,10 @@
-# NestJS Presentations
+# Technical Presentations
 
-Collection of presentations about NestJS and related technologies using reveal.js.
+Collection of presentations on various topics including:
+- NestJS and its integrations
+- Real-time communication protocols
+- API design patterns
+- Modern web technologies
 
 ## IMPORTANT!
 ### Quick Start
