@@ -14,11 +14,11 @@ However, for the best experience:
 - 🌐 Use a modern browser (Chrome, Firefox, Edge)
 - 📺 View in full screen (press F11)
 - ⌨️ Use keyboard navigation:
-  - Space/Arrow Right: Next slide
-  - Arrow Left: Previous slide
-  - Overview: Press 'O'
-  - Full Screen: Press 'F'
-  - Speaker Notes: Press 'S'
+  - ➡️ Space/Arrow Right: Next slide
+  - ⬅️ Arrow Left: Previous slide
+  - 🔍 Overview: Press 'O'
+  - 📺 Full Screen: Press 'F'
+  - 📝 Speaker Notes: Press 'S'
 
 ### Advanced Setup (Optional)
 If you need features like live reload during development or PDF export, follow the Setup section below.
