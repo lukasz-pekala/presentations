@@ -1,4 +1,4 @@
-# Technical Presentations
+# Technical Presentations 🎯
 
 Collection of presentations on various topics including:
 - NestJS and its integrations
