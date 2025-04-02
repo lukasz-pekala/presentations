@@ -6,8 +6,8 @@ Collection of presentations on various topics including:
 - API design patterns
 - Modern web technologies
 
-## IMPORTANT!
-### Quick Start
+## ❗ IMPORTANT!
+### 🚀 Quick Start
 You generally don't need to install anything - just open the HTML file using your browser and that's it!
 
 However, for the best experience:
@@ -36,14 +36,14 @@ live-server
 3. Open in your browser:
    - gRPC and tRPC: [http://localhost:8080/gRPC-tRPC-NestJS.html](http://localhost:8080/gRPC-tRPC-NestJS.html)
 
-## Features
+## ✨ Features
 
 - 🎨 Dark/light theme support
 - 📱 Responsive design
 - 🖨️ PDF export support
 - ⌨️ Code syntax highlighting
 
-## Generating PDF
+## 📄 Generating PDF
 
 1. Open the presentation with the PDF parameter:
 ```
@@ -57,16 +57,16 @@ http://localhost:8080/gRPC-tRPC-NestJS.html?print-pdf
    - Margins: None
    - Background graphics: Enabled
 
-## Development
+## 🛠️ Development
 
 The presentations use:
-- reveal.js for slides
-- highlight.js for code syntax highlighting
-- Font Awesome for icons
+- 🎮 reveal.js for slides
+- 🌈 highlight.js for code syntax highlighting
+- 🎨 Font Awesome for icons
 
-## Adding New Presentations
 
-1. Create a new HTML file
-2. Copy the basic structure from existing presentations
-3. Update the content
-4. Add link to the new presentation in this README
+## 📚 Adding New Presentations
+1. 📝 Create a new HTML file
+2. 📋 Copy the basic structure from existing presentations
+3. ✏️ Update the content
+4. 🔗 Add link to the new presentation in this README
