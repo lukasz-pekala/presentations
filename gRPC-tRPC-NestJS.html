@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tRPC, gRPC i integracja z NestJS</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reset.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/black.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/vs2015.min.css"
+    />
+    <style>
+        .reveal pre {
+            width: 100%;
+            margin: 20px auto;
+        }
+        
+        .reveal pre code {
+            max-height: 600px;
+            padding: 20px;
+        } 
+
+        /* Zmniejszenie rozmiaru czcionki w całej prezentacji */
+        .reveal {
+            font-size: 2em;
+        }
+        
+        .reveal h1 {
+            font-size: 2.4em;
+        }
+        
+        .reveal h2 {
+            font-size: 2em;
+        }
+        
+        .reveal h3 {
+            font-size: 1.6em;
+        }
+        
+        .reveal h4 {
+            font-size: 1.4em;
+        }
+        
+        .reveal h5 {
+            font-size: 1.2em;
+        }
+        
+        .reveal pre code {
+            font-size: 1em;
+        }
+        
+        .reveal ul, .reveal ol {
+            font-size: 0.9em;
+        }
+        
+        .reveal table {
+            font-size: 0.75em;
+        }
+
+        /* Color classes for tRPC vocabulary and SSE fields - theme adaptive */
+        .reveal.has-light-background .text-green-600, 
+        .reveal.has-light-background .dark\:text-green-400 { color: #059669; } /* Darker green for light theme */
+
+        .reveal.has-light-background .text-teal-700,
+        .reveal.has-light-background .dark\:text-teal-400 { color: #0f766e; } /* Darker teal for light theme */
+
+        .reveal.has-light-background .text-blue-700,
+        .reveal.has-light-background .dark\:text-blue-400 { color: #1d4ed8; } /* Darker blue for light theme */
+
+        .reveal.has-light-background .text-violet-700,
+        .reveal.has-light-background .dark\:text-violet-400 { color: #6d28d9; } /* Darker violet for light theme */
+
+        .reveal.has-light-background .text-yellow-600,
+        .reveal.has-light-background .dark\:text-yellow-400 { color: #d97706; } /* Darker yellow for light theme */
+
+        .reveal.has-light-background .text-red-600,
+        .reveal.has-light-background .dark\:text-red-400 { color: #dc2626; } /* Darker red for light theme */
+
+        /* Keep the original darker colors for dark background (default) */
+        .text-green-600, .dark\:text-green-400 { color: #4ade80; }
+        .text-teal-700, .dark\:text-teal-400 { color: #2dd4bf; }
+        .text-blue-700, .dark\:text-blue-400, 
+        .text-event-type { color: #60a5fa; }
+        .text-violet-700, .dark\:text-violet-400 { color: #a78bfa; }
+        .text-blue-600, .dark\:text-blue-400 { color: #93c5fd; }
+        .text-yellow-600, .dark\:text-yellow-400 { color: #fbbf24; }
+        .text-red-600, .dark\:text-red-400 { color: #f87171; }
+
+        /* Fragmenty */
+        .fragment {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .fragment.visible {
+            opacity: 1;
+        }
+
+        /* Dostosowanie do mobilnych urządzeń */
+        @media (max-width: 768px) {
+            .reveal { 
+                font-size: 1.5em; /* Zmniejszenie rozmiaru czcionki na mniejszych ekranach */
+            }
+        }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- SLIDE 1: Tytułowa -->
+        <section data-auto-animate>
+          <h1 style="font-size: 3.5em">tRPC</h1>
+          <h3>Integracja z NestJS</h3>
+        </section>
+
+        <section data-auto-animate>
+          <h1 style="font-size: 3.5em">ale najpierw...</h1>
+          <h3>... to co nam bliższe</h3>
+        </section>
+
+        <!-- NEW SLIDE: SignalR Introduction -->
+        <section>
+          <h3>SignalR - Komunikacja Real-Time</h3>
+          <div class="fragment" style="text-align: center; margin: 20px 0;">
+            <img src="https://az-icons.com/export/icons/a39e7fd3307ff56cc26d5a64eec7bf3f.svg" alt="SignalR Logo" style="height: 120px;">
+          </div>
+          <ul>
+            <li class="fragment">🔄 Dwukierunkowa komunikacja w czasie rzeczywistym</li>
+            <li class="fragment">🚀 Automatyczne zarządzanie połączeniami</li>
+            <li class="fragment">🔁 Fallback między protokołami transportu</li>
+            <li class="fragment">🔌 Integracja z ASP.NET Core i JavaScript</li>
+          </ul>
+        </section>
+
+        <!-- NEW SLIDE: SignalR Transport Technologies -->
+        <section>
+          <h3>Technologie Transportu SignalR</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Mechanizmy transportu</h4>
+              <ul>
+                <li class="fragment"><strong>WebSockets</strong> - preferowana opcja, pełny dupleks</li>
+                <li class="fragment"><strong>Server-Sent Events</strong> - jednokierunkowy strumień</li>
+                <li class="fragment"><strong>Long Polling</strong> - fallback dla starszych przeglądarek</li>
+                <li class="fragment"><strong>Forever Frame</strong> (historycznie) - dla IE</li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>Automatyczny transport negotiation</h4>
+              <pre><code class="language-javascript" data-trim>
+const connection = new signalR.HubConnectionBuilder()
+  .withUrl("/chathub")
+  .withAutomaticReconnect()
+  .build();
+
+// SignalR automatycznie wybierze najlepszy 
+// dostępny transport
+connection.start();
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEW SLIDE: SignalR Features -->
+        <section>
+          <h3>Funkcjonalności SignalR</h3>
+          <ul>
+            <li class="fragment">🔍 <strong>Grupy</strong> - łatwe zarządzanie grupami klientów</li>
+            <li class="fragment">🔄 <strong>Hub Protocol</strong> - format serializacji danych między klientem a serwerem</li>
+            <li class="fragment">⚡ <strong>Skalowalność</strong> - wsparcie dla Redis backplane, Azure SignalR Service</li>
+            <li class="fragment">🔒 <strong>Autoryzacja</strong> - integracja z systemem uwierzytelniania</li>
+          </ul>
+          <div class="fragment">
+            <h4>Hub API</h4>
+            <pre><code class="language-typescript" data-trim>
+// Server (C#)
+public class ChatHub : Hub
+{
+  public async Task SendMessage(string user, string message)
+  {
+    await Clients.All.SendAsync("ReceiveMessage", user, message);
+  }
+}
+
+// Client (TypeScript)
+connection.on("ReceiveMessage", (user, message) => {
+  // Handle incoming message
+});
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- NEW SLIDE: SignalR vs Other Technologies -->
+        <section>
+          <h3>Porównanie Technologii Komunikacji</h3>
+          <div style="overflow-x: auto;">
+            <table style="font-size: 0.5em;">
+              <thead>
+                <tr>
+                  <th>Cecha</th>
+                  <th>SignalR</th>
+                  <th>Socket.IO</th>
+                  <th>WebSocket</th>
+                  <th>tRPC</th>
+                  <th>gRPC</th>
+                  <th>SSE</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="fragment">
+                  <td>Typowanie</td>
+                  <td>⚠️ Ograniczone</td>
+                  <td>❌ Brak</td>
+                  <td>❌ Brak</td>
+                  <td>✅ End-to-end</td>
+                  <td>✅ Protobuf</td>
+                  <td>❌ Brak</td>
+                </tr>
+                <tr class="fragment">
+                  <td>Kierunek komunikacji</td>
+                  <td>✅ Dwukierunkowa</td>
+                  <td>✅ Dwukierunkowa</td>
+                  <td>✅ Dwukierunkowa</td>
+                  <td>✅ Dwukierunkowa</td>
+                  <td>✅ Dwukierunkowa</td>
+                  <td>⚠️ Jednokierunkowa</td>
+                </tr>
+                <tr class="fragment">
+                  <td>Standard HTTP</td>
+                  <td>HTTP/1.1, HTTP/2</td>
+                  <td>HTTP/1.1</td>
+                  <td>Tylko handshake</td>
+                  <td>HTTP/1.1, HTTP/2</td>
+                  <td>⚠️ Wymaga HTTP/2</td>
+                  <td>HTTP/1.1, HTTP/2</td>
+                </tr>
+                <tr class="fragment">
+                  <td>Transport Fallback</td>
+                  <td>✅ Automatyczny</td>
+                  <td>✅ Automatyczny</td>
+                  <td>❌ Brak</td>
+                  <td>⚠️ Manual</td>
+                  <td>❌ Brak</td>
+                  <td>✅ HTTP</td>
+                </tr>
+                <tr class="fragment">
+                  <td>Skalowalność</td>
+                  <td>✅ Azure Service</td>
+                  <td>✅ Redis Adapter</td>
+                  <td>⚠️ Manual</td>
+                  <td>⚠️ Manual</td>
+                  <td>✅ Wysoka</td>
+                  <td>✅ Stateless</td>
+                </tr>
+                <tr class="fragment">
+                  <td>Wsparcie dla języków</td>
+                  <td>⚠️ .NET, JS</td>
+                  <td>⚠️ Node.js, JS</td>
+                  <td>✅ Uniwersalne</td>
+                  <td>❌ Tylko TS/JS</td>
+                  <td>✅ Polyglot (15+)</td>
+                  <td>✅ Uniwersalne</td>
+                </tr>
+                <tr class="fragment">
+                  <td>Przypadki użycia</td>
+                  <td>Czaty, powiadomienia, gry</td>
+                  <td>Czaty, powiadomienia, gry</td>
+                  <td>Real-time powiadomienia, gry, data</td>
+                  <td>aplikacje Full-stack TS</td>
+                  <td>Mikroserwisy</td>
+                  <td>Powiadomienia, monitoring</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SLIDE 2: tRPC w NestJS - Wprowadzenie -->
+        <section>
+          <h3>tRPC w NestJS</h3>
+          <h3>End-to-End Type Safety</h3>
+          <ul>
+            <li class="fragment">🔄 Pełne typowanie między klientem a serwerem</li>
+            <li class="fragment">🛠️ Automatyczna walidacja danych</li>
+            <li class="fragment">📱 Wygodne API dla frontendów</li>
+          </ul>
+        </section>
+
+        <!-- NEW SLIDE: tRPC Vocabulary -->
+        <section>
+          <h3>tRPC - Kluczowe pojęcia</h3>
+          <table width="100%">
+            <thead>
+              <tr>
+                <th>Term</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="fragment">
+                <td><strong class="text-green-600 dark:text-green-400">Procedure</strong></td>
+                <td>Endpoint API - może być <strong class="text-teal-700 dark:text-teal-400">query</strong>, <strong class="text-teal-700 dark:text-teal-400">mutation</strong> lub <strong class="text-teal-700 dark:text-teal-400">subscription</strong>.</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-teal-700 dark:text-teal-400">Query</strong></td>
+                <td><strong class="text-green-600 dark:text-green-400">Procedura</strong> służąca do pobierania danych.</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-teal-700 dark:text-teal-400">Mutation</strong></td>
+                <td><strong class="text-green-600 dark:text-green-400">Procedura</strong> służąca do tworzenia, aktualizacji lub usuwania danych.</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-teal-700 dark:text-teal-400">Subscription</strong></td>
+                <td><strong class="text-green-600 dark:text-green-400">Procedura</strong> tworząca połączenie stałe do nasłuchiwania zmian.</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-blue-700 dark:text-blue-400">Router</strong></td>
+                <td>Kolekcja <strong class="text-green-600 dark:text-green-400">procedur</strong> (i/lub innych routerów) pod wspólną przestrzenią nazw.</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-violet-700 dark:text-violet-400">Context</strong></td>
+                <td>Dane dostępne dla każdej <strong class="text-green-600 dark:text-green-400">procedury</strong>. Często używany do przechowywania stanu sesji i połączeń z bazą danych.</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-blue-600 dark:text-blue-400">Middleware</strong></td>
+                <td>Funkcja wykonywana przed i po <strong class="text-green-600 dark:text-green-400">procedurze</strong>. Może modyfikować <strong class="text-violet-700 dark:text-violet-400">context</strong>.</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-blue-600 dark:text-blue-400">Input</strong></td>
+                <td>Dane wejściowe procedury z walidacją: "Czy te dane zawierają odpowiednie informacje?"</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-yellow-600 dark:text-yellow-400">Output</strong></td>
+                <td>Dane zwracane z <strong class="text-green-600 dark:text-green-400">procedury</strong>, w pełni typowane.</td>
+              </tr>
+              <tr class="fragment">
+                <td><strong class="text-red-600 dark:text-red-400">Error formatter</strong></td>
+                <td>Określa format błędów zwracanych do klienta.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="fragment" style="margin-top: 20px; text-align: center;">
+            <p>Każde pojęcie jest w pełni typowane end-to-end dzięki TypeScript</p>
+          </div>
+        </section>
+
+        <!-- NEW SLIDE: Przykład kodu tRPC -->
+        <section>
+          <h3>Przykład kodu tRPC</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Backend (NestJS)</h4>
+              <pre><code class="language-typescript" data-trim>
+// user.router.ts
+import { Injectable } from '@nestjs/common';
+import { initTRPC } from '@trpc/server';
+import { z } from 'zod';
+
+@Injectable()
+export class UserRouter {
+  private t = initTRPC.create();
+  
+  // Definiowanie routera
+  public router = this.t.router({
+    // Procedura typu query (pobieranie danych)
+    getUsers: this.t.procedure
+      .query(async () => {
+        return [
+          { id: 1, name: 'Jan Kowalski' },
+          { id: 2, name: 'Anna Nowak' }
+        ];
+      }),
+    
+    // Procedura typu mutation (z walidacją)
+    createUser: this.t.procedure
+      .input(z.object({
+        name: z.string().min(2),
+        email: z.string().email()
+      }))
+      .mutation(async ({ input }) => {
+        // Zapis do bazy danych...
+        return { id: 3, ...input };
+      })
+  });
+}
+      </code></pre>
+            </div>
+            <div class="fragment">
+              <h4>Frontend (React)</h4>
+              <pre><code class="language-typescript" data-trim>
+// client.ts
+import { createTRPCReact } from '@trpc/react-query';
+import type { AppRouter } from '../server/router';
+
+export const trpc = createTRPCReact<AppRouter>();
+
+// UserList.tsx
+function UserList() {
+  // ✅ Pełne typowanie - bez definiowania interfejsów!
+  const { data: users, isLoading } = trpc.getUsers.useQuery();
+  
+  // ✅ Automatyczna walidacja w czasie kompilacji
+  const mutation = trpc.createUser.useMutation();
+  
+  const handleAddUser = () => {
+    mutation.mutate({ 
+      name: 'Nowy Użytkownik',
+      email: 'uzytkownik@example.com' 
+    });
+    // ❌ Error: Property 'age' nie istnieje
+    // mutation.mutate({ name: 'Test', age: 25 });
+  };
+
+  return (
+    <div>
+      {isLoading ? 'Ładowanie...' : 
+        users?.map(user => <div key={user.id}>{user.name}</div>)}
+      <button onClick={handleAddUser}>Dodaj</button>
+    </div>
+  );
+}
+      </code></pre>
+            </div>
+          </div>
+          <div class="fragment" style="margin-top: 20px">
+            <p>🔗 <strong>End-to-end typowanie</strong> - bez dodatkowego kodu!</p>
+          </div>
+        </section>
+
+        <!-- SLIDE 3: Problemy Integracji - Tytuł -->
+        <section data-background-color="#1a1a1a">
+          <h3>Problemy Integracji tRPC z NestJS</h3>
+          <p>Potężne połączenie, ale z wyzwaniami...</p>
+        </section>
+
+        <!-- SLIDE 4: Problem 1 - Dependency Injection -->
+        <section>
+          <h5>❌ Bad Practice: Manual instantiation bypasses DI</h5>
+          <div>
+            <pre><code class="language-typescript" data-trim>
+const router = t.router({
+  getUsers: t.procedure.query(() => new UserService().getUsers())
+});
+            </code></pre>
+          </div>
+          <div class="fragment">
+            <h6>✅ Proper DI Integration (nestjs-trpc Adapter)</h6>
+            <pre><code class="language-typescript" data-trim>
+import { Router, Query, Inject } from 'nestjs-trpc';
+import { UserService } from './user.service';
+
+@Router()
+export class UserRouter {
+  constructor(@Inject(UserService) private userService: UserService) {}
+
+  @Query()
+  async getUsers() {
+    return this.userService.getUsers();
+  }
+}
+            </code></pre>
+          </div>
+          <div class="fragment">
+            <h4>nestjs-trpc</h4>
+            <p><a href="https://www.nestjs-trpc.io/docs/routers#writing-routers">https://www.nestjs-trpc.io/docs/routers#writing-routers</a></p>
+          </div>
+        </section>
+
+        <!-- SLIDE 5: Problem 2 - Validation Overlap -->
+        <section>
+          <h3>2. Validation Overlap</h3>
+          <div>
+            <h4>Problem:</h4>
+            <pre><code class="language-typescript" data-trim>
+// ❌ Duplicate validation
+@Post()
+createUser(@Body(ValidationPipe) dto: CreateUserDto) { ... }
+
+// In tRPC router
+.input(z.object({ name: z.string() }))
+            </code></pre>
+          </div>
+          <div class="fragment">
+            <h4>Rozwiązanie:</h4>
+            <p>Standardowe użycie Zod dla walidacji end-to-end oraz wyłączenie NestJS pipes dla tras tRPC.</p>
+          </div>
+        </section>
+
+        <!-- SLIDE 6: Problem 3 - Error Handling -->
+        <section>
+          <h3>3. Error Handling Collisions</h3>
+          <div>
+            <h4>Problem:</h4>
+            <pre><code class="language-json" data-trim>
+// NestJS error
+{ "statusCode": 404, "message": "Not Found" }
+
+// tRPC error
+{ "error": { "code": "NOT_FOUND" } }
+            </code></pre>
+          </div>
+          <div class="fragment">
+            <h4>Rozwiązanie:</h4>
+            <pre><code class="language-typescript" data-trim>
+// trpc.config.ts
+export const trpcErrorFormatter: ErrorFormatter = (error) => {
+  if (error.shape?.data.httpStatus) {
+    return { code: error.code, httpStatus: error.data.httpStatus };
+  }
+  return { code: 'INTERNAL_SERVER_ERROR' };
+};
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- SLIDE 7: Problem 4 - Middleware Bypass -->
+        <section>
+          <h3>4. Middleware Bypass</h3>
+          <div>
+            <h4>Problem:</h4>
+            <p>Guardy i interceptory NestJS nie są automatycznie stosowane do tras tRPC.</p>
+          </div>
+          <div class="fragment">
+            <h4>Rozwiązanie:</h4>
+            <pre><code class="language-typescript" data-trim>
+// Authentication middleware
+const isAuthed = t.middleware(({ ctx, next }) => {
+  if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED' });
+  return next();
+});
+
+export const protectedProcedure = t.procedure.use(isAuthed);
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- SLIDE 8: Problem 5 - Type Explosion -->
+        <section>
+          <h3>5. Type Explosion</h3>
+          <div>
+            <h4>Problem:</h4>
+            <p>Złożone typy z `AppRouter` mogą spowolnić TypeScript (10k+ linii w plikach `.d.ts`).</p>
+          </div>
+          <div class="fragment">
+            <h4>Rozwiązanie:</h4>
+            <ul>
+              <li>Użyj `@trpc/server/aws-lambda` dla lżejszych eksportów typów</li>
+              <li>Implementuj cachowanie typów z `tsc --incremental`</li>
+              <li>Separuj typy frontend/backend używając granic monorepo</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 9: Problem 6 - Performance -->
+        <section>
+          <h3>6. Performance Bottlenecks</h3>
+          <div>
+            <h4>Problem:</h4>
+            <pre><code class="language-typescript" data-trim>
+// ❌ Re-initializing heavy services per request
+createContext: ({ req }) => new HeavyAuthService(req.headers)
+            </code></pre>
+          </div>
+          <div class="fragment">
+            <h4>Optymalizacja:</h4>
+            <pre><code class="language-typescript" data-trim>
+// ✅ Reuse existing DI tree
+createContext: ({ req }) => ({ req, nestJsContainer: app.get(Container) })
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- SLIDE 10: Problem 7 - Testing -->
+        <section>
+          <h3>7. Testing Complexity</h3>
+          <div>
+            <h4>Wyzwanie:</h4>
+            <p>Mockowanie zależności DI w procedurach tRPC.</p>
+          </div>
+          <div class="fragment">
+            <h4>Rozwiązanie:</h4>
+            <pre><code class="language-typescript" data-trim>
+// test/user.router.spec.ts
+const module = await Test.createTestingModule({
+  providers: [UserRouter, { provide: UserService, useClass: MockUserService }]
+}).compile();
+
+const router = module.get(UserRouter);
+            </code>
+            </pre>
+          </div>
+        </section>
+
+<!-- SLIDE 11: Pro Tips -->
+<section>
+<h3>Pro Tips dla Enterprise Scaling</h3>
+<ol>
+            <li class="fragment">Użyj <strong>Nx Monorepo</strong> dla wspólnych typów między frontendem Angular a backendem NestJS</li>
+            <li class="fragment">Zaimplementuj <strong>Distributed Tracing</strong> dla procedur tRPC</li>
+            <li class="fragment">Skonfiguruj <strong>Schema Registry</strong> dla kompatybilnej wstecznie ewolucji API</li>
+            <li class="fragment">Zastosuj <strong>tRPC Shield</strong> dla szczegółowej kontroli uprawnień</li>
+          </ol>
+        </section>
+
+        <!-- SLIDE 12: Dlaczego tRPC a nie gRPC? (Title) -->
+        <section>
+          <h3>Dlaczego tRPC a nie gRPC?</h3>
+          <p class="fragment">Porównanie dla aplikacji TypeScript/JavaScript</p>
+          <div class="fragment" style="margin-top: 30px">
+            <img src="https://trpc.io/img/logo.svg" alt="tRPC Logo" style="height: 80px; margin-right: 50px">
+            <span style="font-size: 2em">vs</span>
+            <img src="https://grpc.io/img/logos/grpc-logo.png" alt="gRPC Logo" style="height: 80px; margin-left: 50px">
+          </div>
+        </section>
+
+        <!-- SLIDE 13: Integracja z TypeScript -->
+        <section>
+          <h3>1. Ścisła integracja z TypeScript</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>tRPC</h4>
+              <ul>
+                <li class="fragment">✅ Natywna obsługa TypeScript</li>
+                <li class="fragment">✅ End-to-end typesafety</li>
+                <li class="fragment">✅ Zero-schemas, zero-codegen</li>
+                <li class="fragment">✅ Automatyczne propagowanie typów</li>
+              </ul>
+            </div>
+            <div>
+              <h4>gRPC</h4>
+              <ul>
+                <li class="fragment">⚠️ Wymaga protobuf (.proto)</li>
+                <li class="fragment">⚠️ Potrzebne generatory kodu</li>
+                <li class="fragment">⚠️ Dodatkowe narzędzia (protoc)</li>
+                <li class="fragment">⚠️ Bardziej złożona implementacja</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 14: Prostota i szybkość wdrożenia -->
+        <section>
+          <h3>2. Prostota i szybkość wdrożenia</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>tRPC</h4>
+              <pre><code class="language-typescript" data-trim>
+import { initTRPC } from '@trpc/server';
+const t = initTRPC.create();
+
+// Definiuj API
+export const appRouter = t.router({
+  hello: t.procedure
+    .input(z.string())
+    .query((opts) => {
+      return `Hello ${opts.input}!`;
+    }),
+});
+              </code></pre>
+            </div>
+            <div>
+              <h4>gRPC</h4>
+              <pre><code class="language-protobuf" data-trim>
+// hello.proto
+syntax = "proto3";
+
+service Hello {
+  rpc SayHello (HelloRequest) 
+      returns (HelloResponse);
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloResponse {
+  string message = 1;
+}
+              </code></pre>
+              <p class="fragment">+ dodatkowe generowanie kodu</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 15: Zastosowanie w aplikacjach webowych -->
+        <section>
+          <h3>3. Zastosowanie w aplikacjach webowych</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>tRPC</h4>
+              <ul>
+                <li class="fragment">✅ Idealne dla SPA (React, Angular, Vue)</li>
+                <li class="fragment">✅ Natywna obsługa HTTP/JSON</li>
+                <li class="fragment">✅ Integracja z Next.js, Nuxt, SvelteKit</li>
+                <li class="fragment">✅ Prosta obsługa danych strukturalnych</li>
+              </ul>
+            </div>
+            <div>
+              <h4>gRPC</h4>
+              <ul>
+                <li class="fragment">⚠️ Wymaga gRPC-web dla przeglądarek</li>
+                <li class="fragment">⚠️ Potrzebny proxy gRPC-web</li>
+                <li class="fragment">✅ Świetny dla mikroserwisów</li>
+                <li class="fragment">✅ Streaming danych</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 16: Ekosystem i przypadki użycia -->
+        <section>
+          <h3>4. Ekosystem i przypadki użycia</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>tRPC</h4>
+              <ul>
+                <li class="fragment">✅ Full-stack JS/TS</li>
+                <li class="fragment">✅ Monolity lub systemy powiązane</li>
+                <li class="fragment">⚠️ Ograniczone do TypeScript/JavaScript</li>
+                <li class="fragment">⚠️ Mniejszy ekosystem</li>
+              </ul>
+            </div>
+            <div>
+              <h4>gRPC</h4>
+              <ul>
+                <li class="fragment">✅ Polyglot (wiele języków)</li>
+                <li class="fragment">✅ Systemy rozproszone</li>
+                <li class="fragment">✅ Rozbudowany ekosystem</li>
+                <li class="fragment">✅ Wsparcie dużych firm</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 17: Wydajność -->
+        <section>
+          <h3>5. Wydajność</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>tRPC</h4>
+              <ul>
+                <li class="fragment">⚠️ Bazuje na HTTP/JSON</li>
+                <li class="fragment">⚠️ Większy rozmiar danych</li>
+                <li class="fragment">✅ Wystarczające dla większości aplikacji webowych</li>
+                <li class="fragment">✅ Niższy narzut dla małych projektów</li>
+              </ul>
+            </div>
+            <div>
+              <h4>gRPC</h4>
+              <ul>
+                <li class="fragment">✅ Bazuje na HTTP/2</li>
+                <li class="fragment">✅ Format binarny (Protobuf)</li>
+                <li class="fragment">✅ Bardzo wydajny dla dużych systemów</li>
+                <li class="fragment">✅ Niskie opóźnienia</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 18: Kiedy wybrać tRPC? -->
+        <section>
+          <h3>6. Kiedy wybrać tRPC?</h3>
+          <ul>
+            <li class="fragment">🚀 Tworzysz aplikację full-stack opartą na TypeScript</li>
+            <li class="fragment">⏱️ Potrzebujesz szybko iterować nad projektem</li>
+            <li class="fragment">🔄 Pracujesz w małym zespole TypeScript</li>
+            <li class="fragment">🧩 Potrzebujesz prostej komunikacji frontend-backend</li>
+            <li class="fragment">📊 Tworzysz aplikacje typu dashboard, CMS, admin panel</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 19: Kiedy wybrać gRPC? -->
+        <section>
+          <h3>7. Kiedy wybrać gRPC?</h3>
+          <ul>
+            <li class="fragment">🌐 Budujesz system rozproszony z wieloma mikroserwisami</li>
+            <li class="fragment">⚡ Potrzebujesz maksymalnej wydajności i niskiego opóźnienia</li>
+            <li class="fragment">🔄 Pracujesz w wielu językach programowania</li>
+            <li class="fragment">📊 Przetwarzasz duże ilości danych</li>
+            <li class="fragment">📱 Potrzebujesz komunikacji bi-directional streaming</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 20: tRPC vs SSE -->
+        <section>
+          <h3>tRPC vs Server-Sent Events (SSE)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Cecha</th>
+                <th>tRPC</th>
+                <th>Server-Sent Events (SSE)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="fragment">
+                <td>Typowanie</td>
+                <td>End-to-end typowanie</td>
+                <td>Brak</td>
+              </tr>
+              <tr class="fragment">
+                <td>Kierunek komunikacji</td>
+                <td>Dwukierunkowa (z WebSocket)</td>
+                <td>Jednokierunkowa (serwer → klient)</td>
+              </tr>
+              <tr class="fragment">
+                <td>Skalowalność</td>
+                <td>Zależna od implementacji</td>
+                <td>Stateless, łatwa do skalowania</td>
+              </tr>
+              <tr class="fragment">
+                <td>Łatwość konfiguracji</td>
+                <td>Wymaga znajomości TypeScript</td>
+                <td>Bardzo prosta konfiguracja</td>
+              </tr>
+              <tr class="fragment">
+                <td>Przykłady użycia</td>
+                <td>Aplikacje społecznościowe, czaty</td>
+                <td>Powiadomienia, aktualizacje statusu</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SLIDE 21: SSE Resources -->
+        <section>
+          <h3>Server-Sent Events (SSE) - Zasoby</h3>
+          <div style="display: flex; justify-content: center; gap: 40px;">
+            <div class="fragment" style="text-align: center;">
+              <img src="https://docs.nestjs.com/assets/logo-small.svg" alt="NestJS Logo" style="height: 100px; margin-bottom: 20px;">
+              <p><a href="https://docs.nestjs.com/techniques/server-sent-events" target="_blank">NestJS SSE Documentation</a></p>
+              <p class="fragment">Implementacja SSE w NestJS</p>
+            </div>
+            <div class="fragment" style="text-align: center;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/d/d2/MDN_Web_Docs_logo.svg" alt="MDN Logo" style="height: 100px; margin-bottom: 20px;">
+              <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events" target="_blank">MDN Web Docs - SSE</a></p>
+              <p class="fragment">Specyfikacja i przykłady implementacji</p>
+            </div>
+          </div>
+          <div class="fragment" style="margin-top: 40px;">
+            <h4>Przykład klienta SSE</h4>
+            <pre><code class="language-javascript" data-trim>
+const eventSource = new EventSource('/api/events');
+eventSource.onmessage = ({ data }) => {
+  console.log('Nowe dane:', JSON.parse(data));
+};
+eventSource.onerror = () => {
+  console.error('Błąd połączenia SSE');
+  eventSource.close();
+};
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- NEW SLIDE: text/event-stream Format Introduction -->
+        <section>
+          <h3>Format text/event-stream</h3>
+          <div class="fragment">
+            <p>Format przesyłania danych używany przez Server-Sent Events (SSE)</p>
+          </div>
+          <ul>
+            <li class="fragment">🔤 Wymagane kodowanie UTF-8</li>
+            <li class="fragment">📝 Wiadomości oddzielone podwójnym znakiem nowej linii (\n\n)</li>
+            <li class="fragment">💬 Linie komentarza zaczynające się od dwukropka (:)</li>
+            <li class="fragment">🔄 Obsługa automatycznego ponownego połączenia</li>
+          </ul>
+        </section>
+
+        <!-- NEW SLIDE: text/event-stream Message Structure -->
+        <section>
+          <h3>Struktura wiadomości text/event-stream</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Pola wiadomości</h4>
+              <ul>
+                <li class="fragment"><strong class="text-blue-700 dark:text-blue-400">event:</strong> Typ zdarzenia</li>
+                <li class="fragment"><strong class="text-green-600 dark:text-green-400">data:</strong> Zawartość wiadomości</li>
+                <li class="fragment"><strong class="text-violet-700 dark:text-violet-400">id:</strong> Unikalny identyfikator</li>
+                <li class="fragment"><strong class="text-yellow-600 dark:text-yellow-400">retry:</strong> Czas ponownego połączenia w ms</li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>Przykład</h4>
+              <pre><code class="language-text" data-trim>
+        : komentarz (ignorowany przez klienta)
+        <strong class="text-violet-700 dark:text-violet-400">id: 1234</strong>
+        <strong class="text-blue-700 dark:text-blue-400">event: update</strong>
+        <strong class="text-green-600 dark:text-green-400">data: {"user": "Jan Kowalski", 
+        data: "status": "online"}</strong>
+        <strong class="text-yellow-600 dark:text-yellow-400">retry: 10000</strong>
+              </code></pre>
+              <p class="fragment">👆 To jest jedna wiadomość SSE</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- NEW SLIDE: text/event-stream Implementation in NestJS -->
+        <section>
+          <h3>Implementacja text/event-stream w NestJS</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Serwer NestJS</h4>
+              <pre><code class="language-typescript" data-trim>
+@Controller('events')
+export class EventsController {
+  @Sse('dashboard')
+  dashboardEvents() {
+    return interval(5000).pipe(
+      map((num) => ({
+        data: {
+          stats: { users: 10 + num, cpu: 50 + num },
+          timestamp: new Date().toISOString()
+        }
+      }))
+    );
+  }
+}
+              </code></pre>
+            </div>
+            <div class="fragment">
+              <h4>Odebrany strumień</h4>
+              <pre><code class="language-json" data-trim>
+data: {"stats":{"users":10,"cpu":50},"timestamp":"2025-04-02T12:00:00.000Z"}
+
+data: {"stats":{"users":11,"cpu":51},"timestamp":"2025-04-02T12:00:05.000Z"}
+
+data: {"stats":{"users":12,"cpu":52},"timestamp":"2025-04-02T12:00:10.000Z"}
+              </code></pre>
+              <p class="fragment">Widoczne podwójne znaki nowej linii oddzielające wiadomości</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 22: Kiedy wybrać jakie rozwiązanie -->
+        <section>
+          <h5>Kiedy wybrać jakie rozwiązanie?</h5>
+          <table>
+            <thead>
+              <tr>
+                <th>Rozwiązanie</th>
+                <th>Najlepsze dla</th>
+                <th>Wady</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="fragment">
+                <td><strong>NestJS + tRPC</strong></td>
+                <td>
+                  <ul>
+                    <li>Zespoły full-stack TypeScript</li>
+                    <li>Aplikacje z bogatym frontendem</li>
+                    <li>Projekty z częstymi zmianami API</li>
+                  </ul>
+                </td>
+                <td>
+                  <ul>
+                    <li>Trudniejsza integracja z innymi językami</li>
+                    <li>Wymaga zarządzania typami na frontendzie</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="fragment">
+                <td><strong>NestJS + gRPC</strong></td>
+                <td>
+                  <ul>
+                    <li>Komunikacja mikroserwisowa</li>
+                    <li>Multi-language projekty</li>
+                    <li>Wymagana wysoka wydajność</li>
+                  </ul>
+                </td>
+                <td>
+                  <ul>
+                    <li>Złożony setup i konfiguracja</li>
+                    <li>Potrzeba generowania kodu</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="fragment">
+                <td><strong>NestJS + SSE</strong></td>
+                <td>
+                  <ul>
+                    <li>Proste powiadomienia w czasie rzeczywistym</li>
+                    <li>Dashboard i monitoring</li>
+                    <li>Raportowanie statusów</li>
+                  </ul>
+                </td>
+                <td>
+                  <ul>
+                    <li>Tylko jednokierunkowa komunikacja</li>
+                    <li>Ograniczone możliwości</li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <h3>Źródła i dokumentacja</h3>
+          <div style="display: grid; grid-template-columns: 1fr; gap: 20px">
+            <div>
+              <h4>tRPC w NestJS</h4>
+              <ul>
+                <li><a href="https://blog.innei.ren/nestjs-with-trpc-and-dependency-injection" target="_blank">
+                  📝 NestJS with tRPC and Dependency Injection - Blog post
+                </a></li>
+                <li><a href="https://www.nestjs-trpc.io/docs" target="_blank">
+                  📚 nestjs-trpc - Oficjalna dokumentacja
+                </a></li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>Server-Sent Events</h4>
+              <ul>
+                <li><a href="https://docs.nestjs.com/techniques/server-sent-events" target="_blank">
+                  📚 Server-Sent Events w NestJS - Oficjalna dokumentacja
+                </a></li>
+                <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events" target="_blank">
+                  📖 MDN Web Docs - Server-sent events
+                </a></li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>Dodatkowe materiały</h4>
+              <ul>
+                <li><a href="https://trpc.io/docs" target="_blank">
+                  📚 tRPC - Oficjalna dokumentacja
+                </a></li>
+                <li><a href="https://grpc.io/docs/" target="_blank">
+                  📚 gRPC - Oficjalna dokumentacja
+                </a></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+    
+      </div>
+    </div>
+
+    <!-- Core libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/protobuf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.js"></script>
+
+    <!-- Reveal.js plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/notes/notes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/search/search.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/zoom/zoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/highlight/highlight.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        try {
+          // Initialize highlight.js
+          hljs.configure({ languages: ["javascript", "bash", "yaml", "json", "protobuf"] });
+          hljs.highlightAll();
+
+          // Initialize Reveal
+          let deck = new Reveal({
+            hash: true,
+            transition: "convex",
+            plugins: [RevealNotes, RevealSearch, RevealZoom],
+            slideNumber: "c/t",
+            pdfSeparateFragments: false,
+            highlight: {
+              highlightOnLoad: true,
+            },
+          });
+
+          deck.initialize();
+        } catch (error) {
+          console.error("Initialization error:", error);
+        }
+      });
+    </script>
+  </body>
+</html>
