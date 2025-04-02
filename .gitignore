@@ -134,3 +134,13 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Generated PDFs
+*.pdf
+
+# VS Code settings
+.vscode/
+
+# OS specific
+.DS_Store
+Thumbs.db
