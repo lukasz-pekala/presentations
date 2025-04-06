@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sztuczna Inteligencja: Wprowadzenie do LLM</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reset.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/black.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/vs2015.min.css"
+    />
+    <style>
+        .reveal pre {
+            width: 100%;
+            margin: 20px auto;
+        }
+        
+        .reveal pre code {
+            max-height: 600px;
+            padding: 20px;
+        } 
+
+        /* Zmniejszenie rozmiaru czcionki w całej prezentacji */
+        .reveal {
+            font-size: 2em;
+        }
+        
+        .reveal h1 {
+            font-size: 2.4em;
+        }
+        
+        .reveal h2 {
+            font-size: 2em;
+        }
+        
+        .reveal h3 {
+            font-size: 1.6em;
+        }
+        
+        .reveal h4 {
+            font-size: 1.4em;
+        }
+        
+        .reveal h5 {
+            font-size: 1.2em;
+        }
+        
+        .reveal pre code {
+            font-size: 1em;
+        }
+        
+        .reveal ul, .reveal ol {
+            font-size: 0.9em;
+        }
+        
+        .reveal table {
+            font-size: 0.75em;
+        }
+
+        /* Color classes for tRPC vocabulary and SSE fields - theme adaptive */
+        .reveal.has-light-background .text-green-600, 
+        .reveal.has-light-background .dark\:text-green-400 { color: #059669; } /* Darker green for light theme */
+
+        .reveal.has-light-background .text-teal-700,
+        .reveal.has-light-background .dark\:text-teal-400 { color: #0f766e; } /* Darker teal for light theme */
+
+        .reveal.has-light-background .text-blue-700,
+        .reveal.has-light-background .dark\:text-blue-400 { color: #1d4ed8; } /* Darker blue for light theme */
+
+        .reveal.has-light-background .text-violet-700,
+        .reveal.has-light-background .dark\:text-violet-400 { color: #6d28d9; } /* Darker violet for light theme */
+
+        .reveal.has-light-background .text-yellow-600,
+        .reveal.has-light-background .dark\:text-yellow-400 { color: #d97706; } /* Darker yellow for light theme */
+
+        .reveal.has-light-background .text-red-600,
+        .reveal.has-light-background .dark\:text-red-400 { color: #dc2626; } /* Darker red for light theme */
+
+        /* Keep the original darker colors for dark background (default) */
+        .text-green-600, .dark\:text-green-400 { color: #4ade80; }
+        .text-teal-700, .dark\:text-teal-400 { color: #2dd4bf; }
+        .text-blue-700, .dark\:text-blue-400, 
+        .text-event-type { color: #60a5fa; }
+        .text-violet-700, .dark\:text-violet-400 { color: #a78bfa; }
+        .text-blue-600, .dark\:text-blue-400 { color: #93c5fd; }
+        .text-yellow-600, .dark\:text-yellow-400 { color: #fbbf24; }
+        .text-red-600, .dark\:text-red-400 { color: #f87171; }
+
+        /* Fragmenty */
+        .fragment {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .fragment.visible {
+            opacity: 1;
+        }
+
+        /* Dostosowanie do mobilnych urządzeń */
+        @media (max-width: 768px) {
+            .reveal { 
+                font-size: 1.5em; /* Zmniejszenie rozmiaru czcionki na mniejszych ekranach */
+            }
+        }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- SLIDE 1: Title -->
+        <section data-auto-animate>
+          <h1 style="font-size: 3.5em">Sztuczna Inteligencja</h1>
+        </section>
+
+        <!-- SLIDE 2: What is and isn't AI -->
+        <section>
+          <h3>Czym jest a czym nie jest AI?</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Jest</h4>
+              <ul>
+                <li class="fragment">System uczący się na podstawie danych</li>
+                <li class="fragment">System rozpoznający wzorce</li>
+                <li class="fragment">System adaptujący się do nowych danych</li>
+                <li class="fragment">System podejmujący decyzje na podstawie prawdopodobieństwa</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Nie jest</h4>
+              <ul>
+                <li class="fragment">Świadomym bytem</li>
+                <li class="fragment">Systemem rozumiejącym znaczenie</li>
+                <li class="fragment">Prawdziwą inteligencją</li>
+                <li class="fragment">Magicznym rozwiązaniem wszystkich problemów</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 3: Capabilities and Limitations -->
+        <section>
+          <h3>Możliwości i Ograniczenia AI</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Możliwości</h4>
+              <ul>
+                <li class="fragment">Analiza ogromnych ilości danych</li>
+                <li class="fragment">Rozpoznawanie wzorców</li>
+                <li class="fragment">Generowanie tekstu i obrazów</li>
+                <li class="fragment">Przewidywanie trendów</li>
+                <li class="fragment">Automatyzacja zadań powtarzalnych</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Ograniczenia</h4>
+              <ul>
+                <li class="fragment">Brak prawdziwego zrozumienia</li>
+                <li class="fragment">Problemy z aktualnością danych</li>
+                <li class="fragment">Trudności z abstrakcyjnym myśleniem</li>
+                <li class="fragment">Zależność od jakości danych treningowych</li>
+                <li class="fragment">Wysokie koszty obliczeniowe</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 4: Bias, Hallucinations, and Their Causes -->
+        <section>
+          <h3>Bias i Halucynacje w AI</h3>
+          <div class="fragment">
+            <h4>Bias (Stronniczość)</h4>
+            <ul>
+              <li>Nierównowaga w danych treningowych</li>
+              <li>Społeczne uprzedzenia w danych źródłowych</li>
+              <li>Nieświadome założenia w projektowaniu modelu</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Halucynacje</h4>
+            <ul>
+              <li>Generowanie nieprawdziwych informacji</li>
+              <li>Łączenie niezwiązanych faktów</li>
+              <li>Nadmierna pewność błędnych odpowiedzi</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Przyczyny</h4>
+            <ul>
+              <li>Niekompletne dane treningowe</li>
+              <li>Ograniczenia modeli probabilistycznych</li>
+              <li>Brak prawdziwego zrozumienia kontekstu</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Trendy w 2025 roku</h4>
+            <ul>
+              <li>LLM nie generują wewnętrznie odniesień</li>
+              <li>Tworzą tekst na podstawie korpusu danych, nie aktywnych badań</li>
+              <li>Generowane cytowania mogą być błędne lub nieaktualne</li>
+            </ul>
+          </div>
+        </section>
+
+         <!-- SLIDE 5: LLMs Introduction -->
+         <section>
+          <h3>LLMs - Wprowadzenie</h3>
+          <div class="fragment">
+            <h4>Large Language Models</h4>
+            <ul>
+              <li>Modele językowe wytrenowane na ogromnych zbiorach tekstu</li>
+              <li>Rozumieją i generują tekst w języku naturalnym</li>
+              <li>Wykorzystują architekturę Transformer</li>
+              <li>Potrafią wykonywać różnorodne zadania językowe</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Przykłady LLMs</h4>
+            <ul>
+              <li>GPT-4 (OpenAI)</li>
+              <li>Claude (Anthropic)</li>
+              <li>Llama 2 (Meta)</li>
+              <li>Gemini (Google)</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 6: LLM Training Stages -->
+        <section>
+          <h3>Etapy trenowania LLM</h3>
+          <div style="display: grid; grid-template-columns: 1fr; gap: 20px">
+            <div class="fragment">
+              <h4>1. Pre-training</h4>
+              <ul>
+                <li>Uczenie na ogromnych zbiorach tekstu</li>
+                <li>Przewidywanie następnego słowa</li>
+                <li>Nauka wzorców językowych</li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>2. Fine-tuning</h4>
+              <ul>
+                <li>Dostosowanie do konkretnych zadań</li>
+                <li>Uczenie na specjalistycznych danych</li>
+                <li>Poprawa dokładności</li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>3. RLHF (Reinforcement Learning from Human Feedback)</h4>
+              <ul>
+                <li>Uczenie z informacją zwrotną od ludzi</li>
+                <li>Dostosowanie do preferencji użytkowników</li>
+                <li>Poprawa bezpieczeństwa i użyteczności</li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>Trendy w 2025 roku</h4>
+              <ul>
+                <li>Modele stają się coraz bardziej efektywne</li>
+                <li>Mniejsze modele (np. Orca, Orca 2) dorównują większym</li>
+                <li>DeepSeek-V3: pierwszy open-source na poziomie GPT-4</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 7: Training Data Volume -->
+        <section>
+          <h3>Ilość danych potrzebna do wytrenowania</h3>
+          <div class="fragment">
+            <h4>Skala danych</h4>
+            <ul>
+              <li>Setki miliardów lub biliony tokenów</li>
+              <li>Petabajty tekstu</li>
+              <li>Miliony godzin pracy CPU/GPU</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Przykładowe wielkości</h4>
+            <table>
+              <tr>
+                <th>Model</th>
+                <th>Ilość danych treningowych</th>
+              </tr>
+              <tr>
+                <td>GPT-3</td>
+                <td>570GB tekstu</td>
+              </tr>
+              <tr>
+                <td>PaLM</td>
+                <td>780B tokenów</td>
+              </tr>
+              <tr>
+                <td>LLaMA</td>
+                <td>1.4T tokenów</td>
+              </tr>
+            </table>
+          </div>
+        </section>
+
+        <!-- SLIDE 8: Model Parameters -->
+        <section>
+          <h3>Parametry modelu (7B, 76B, itp.)</h3>
+          <div class="fragment">
+            <h4>Co oznaczają te liczby?</h4>
+            <ul>
+              <li>B = miliard parametrów (Billion)</li>
+              <li>Parametry = wagi w sieci neuronowej</li>
+              <li>Więcej parametrów = potencjalnie większa zdolność uczenia</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Przykłady</h4>
+            <ul>
+              <li>LLaMA 2 7B: 7 miliardów parametrów</li>
+              <li>GPT-3 175B: 175 miliardów parametrów</li>
+              <li>PaLM 540B: 540 miliardów parametrów</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 9: Large Models -->
+        <section>
+          <h3>Co to znaczy, że model jest duży?</h3>
+          <div class="fragment">
+            <h4>Perspektywa techniczna</h4>
+            <ul>
+              <li>Zajmuje dziesiątki/setki GB pamięci</li>
+              <li>Wymaga wielu GPU do trenowania</li>
+              <li>Długi czas inferencji</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Konsekwencje praktyczne</h4>
+            <ul>
+              <li>Wysokie koszty hostingu</li>
+              <li>Duże zużycie energii</li>
+              <li>Ograniczona dostępność</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 10: Compact Models -->
+        <section>
+          <h3>Modele kompaktowe</h3>
+          <div class="fragment">
+            <h4>Techniki kompresji</h4>
+            <ul>
+              <li>Kwantyzacja (np. 4-bit, 8-bit)</li>
+              <li>Pruning (usuwanie nieistotnych parametrów)</li>
+              <li>Destylacja wiedzy</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Zalety</h4>
+            <ul>
+              <li>Mniejsze wymagania sprzętowe</li>
+              <li>Szybsza inferencja</li>
+              <li>Możliwość uruchomienia na edge devices</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 11: LLM Memory -->
+        <section>
+          <h3>Jak LLM "zapamiętuje" dane</h3>
+          <div class="fragment">
+            <h4>Mechanizmy pamięci</h4>
+            <ul>
+              <li>Wagi w sieci neuronowej</li>
+              <li>Attention mechanisms</li>
+              <li>Kontekstowe okno (context window)</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Ograniczenia</h4>
+            <ul>
+              <li>Brak prawdziwej pamięci długoterminowej</li>
+              <li>Ograniczona długość kontekstu</li>
+              <li>"Zapominanie" wcześniejszych informacji</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 12: Vectors in AI -->
+        <section>
+          <h3>Wektory w AI</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div class="fragment">
+              <h4>Przestrzeń dwuwymiarowa</h4>
+              <ul>
+                <li>Proste reprezentacje x,y</li>
+                <li>Np. położenie na mapie</li>
+                <li>Łatwe do wizualizacji</li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>Przestrzeń N-wymiarowa</h4>
+              <ul>
+                <li>Embeddingi słów</li>
+                <li>Reprezentacje znaczeń</li>
+                <li>Setki/tysiące wymiarów</li>
+              </ul>
+            </div>
+          </div>
+          <div class="fragment">
+            <h4>Zastosowania</h4>
+            <ul>
+              <li>Podobieństwo semantyczne</li>
+              <li>Wyszukiwanie wektorowe</li>
+              <li>Klasyfikacja tekstu</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 13: User Experience Quality -->
+        <section>
+          <h3>Jakość doświadczeń użytkownika z AI</h3>
+          <div class="fragment">
+            <h4>Czynniki wpływające</h4>
+            <ul>
+              <li>Model: rozmiar, jakość treningu</li>
+              <li>Prompt: precyzja, kontekst</li>
+              <li>Proxy: latencja, dostępność</li>
+              <li>Cenzura i ograniczenia</li>
+            </ul>
+          </div>
+          <div class="fragment">
+            <h4>Przykłady usług</h4>
+            <ul>
+              <li>GitHub Copilot: wysoka specjalizacja</li>
+              <li>ChatGPT: szeroki zakres zastosowań</li>
+              <li>Perplexity: fokus na wyszukiwanie</li>
+              <li>Claude: nacisk na bezpieczeństwo</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 14: Q&A -->
+        <section>
+          <h2>Q&A</h2>
+          <div class="fragment">
+            <h4>Jak poradzić sobie z halucynacjami LLM?</h4>
+            <p>Używaj RAG (Retrieval-Augmented Generation) i weryfikuj źródła</p>
+          </div>
+          <div class="fragment">
+            <h4>Jak wybrać odpowiedni model dla mojego przypadku użycia?</h4>
+            <p>Rozważ rozmiar kontekstu, wydajność, koszt i wymagania licencyjne</p>
+          </div>
+          <div class="fragment">
+            <h4>Czy potrzebuję dużej infrastruktury do użycia LLM?</h4>
+            <p>Nie zawsze - istnieją wydajne modele lokalne i rozwiązania chmurowe</p>
+          </div>
+        </section>
+
+    
+      </div>
+    </div>
+
+    <!-- Core libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/protobuf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.js"></script>
+
+    <!-- Reveal.js plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/notes/notes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/search/search.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/zoom/zoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/highlight/highlight.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        try {
+          // Initialize highlight.js
+          hljs.configure({ languages: ["javascript", "bash", "yaml", "json", "protobuf"] });
+          hljs.highlightAll();
+
+          // Initialize Reveal
+          let deck = new Reveal({
+            hash: true,
+            transition: "convex",
+            plugins: [RevealNotes, RevealSearch, RevealZoom],
+            slideNumber: "c/t",
+            pdfSeparateFragments: false,
+            highlight: {
+              highlightOnLoad: true,
+            },
+          });
+
+          deck.initialize();
+        } catch (error) {
+          console.error("Initialization error:", error);
+        }
+      });
+    </script>
+  </body>
+</html>
