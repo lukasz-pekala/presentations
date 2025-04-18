@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monorepo: Nx i npm workspaces - wprowadzenie</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reset.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/theme/black.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/vs2015.min.css"
+    />
+    <style>
+        .reveal pre {
+            width: 100%;
+            margin: 20px auto;
+        }
+        
+        .reveal pre code {
+            max-height: 600px;
+            padding: 20px;
+        } 
+
+        /* Zmniejszenie rozmiaru czcionki w całej prezentacji */
+        .reveal {
+            font-size: 2em;
+        }
+        
+        .reveal h1 {
+            font-size: 2.4em;
+        }
+        
+        .reveal h2 {
+            font-size: 2em;
+        }
+        
+        .reveal h3 {
+            font-size: 1.6em;
+        }
+        
+        .reveal h4 {
+            font-size: 1.4em;
+        }
+        
+        .reveal h5 {
+            font-size: 1.2em;
+        }
+        
+        .reveal pre code {
+            font-size: 1em;
+        }
+        
+        .reveal ul, .reveal ol {
+            font-size: 0.9em;
+        }
+        
+        .reveal table {
+            font-size: 0.75em;
+        }
+
+        /* Color classes for monorepo vocabulary - theme adaptive */
+        .reveal.has-light-background .text-green-600, 
+        .reveal.has-light-background .dark\:text-green-400 { color: #059669; } /* Darker green for light theme */
+
+        .reveal.has-light-background .text-teal-700,
+        .reveal.has-light-background .dark\:text-teal-400 { color: #0f766e; } /* Darker teal for light theme */
+
+        .reveal.has-light-background .text-blue-700,
+        .reveal.has-light-background .dark\:text-blue-400 { color: #1d4ed8; } /* Darker blue for light theme */
+
+        .reveal.has-light-background .text-violet-700,
+        .reveal.has-light-background .dark\:text-violet-400 { color: #6d28d9; } /* Darker violet for light theme */
+
+        .reveal.has-light-background .text-yellow-600,
+        .reveal.has-light-background .dark\:text-yellow-400 { color: #d97706; } /* Darker yellow for light theme */
+
+        .reveal.has-light-background .text-red-600,
+        .reveal.has-light-background .dark\:text-red-400 { color: #dc2626; } /* Darker red for light theme */
+
+        /* Keep the original darker colors for dark background (default) */
+        .text-green-600, .dark\:text-green-400 { color: #4ade80; }
+        .text-teal-700, .dark\:text-teal-400 { color: #2dd4bf; }
+        .text-blue-700, .dark\:text-blue-400, 
+        .text-event-type { color: #60a5fa; }
+        .text-violet-700, .dark\:text-violet-400 { color: #a78bfa; }
+        .text-blue-600, .dark\:text-blue-400 { color: #93c5fd; }
+        .text-yellow-600, .dark\:text-yellow-400 { color: #fbbf24; }
+        .text-red-600, .dark\:text-red-400 { color: #f87171; }
+
+        /* Fragmenty */
+        .fragment {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .fragment.visible {
+            opacity: 1;
+        }
+
+        /* Dostosowanie do mobilnych urządzeń */
+        @media (max-width: 768px) {
+            .reveal { 
+                font-size: 1.5em; /* Zmniejszenie rozmiaru czcionki na mniejszych ekranach */
+            }
+        }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- SLIDE 1: Tytułowa -->
+        <section data-auto-animate>
+          <h1 style="font-size: 3.5em">Monorepo</h1>
+          <h3>Wprowadzenie, Nx i npm workspaces</h3>
+        </section>
+
+        <!-- SLIDE 2: Czym jest monorepo -->
+        <section>
+          <h3>Czym jest monorepo?</h3>
+          <div class="fragment" style="text-align: center; margin: 20px 0;">
+            <img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" alt="Monorepo Diagram" style="height: 180px;">
+          </div>
+          <p class="fragment">Pojedyncze repozytorium zawierające <strong>wiele odrębnych projektów</strong> z dobrze zdefiniowanymi relacjami</p>
+          <div class="fragment">
+            <h4>To <strong>nie jest</strong> po prostu:</h4>
+            <ul>
+              <li>Współlokacja kodu bez powiązań</li>
+              <li>Monolit (duża, niemodularna aplikacja)</li>
+              <li>Przypadkowa kolekcja projektów</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- SLIDE 3: Monorepo vs Polyrepo -->
+        <section>
+          <h3>Monorepo vs Polyrepo</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Monorepo</h4>
+              <img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" alt="Monorepo Diagram" style="height: 120px; margin: 15px 0;">
+              <ul>
+                <li class="fragment">Jeden repozytorium</li>
+                <li class="fragment">Wiele projektów</li>
+                <li class="fragment">Współdzielone zależności</li>
+                <li class="fragment">Zdefiniowane relacje</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Polyrepo (standard)</h4>
+              <img src="https://d33wubrfki0l68.cloudfront.net/617b27051d161a8a0c30db6a366d9e1ba9e835a6/c7467/assets/images/advantages-of-monorepo-5.svg" alt="Polyrepo Diagram" style="height: 120px; margin: 15px 0;">
+              <ul>
+                <li class="fragment">Wiele repozytoriów</li>
+                <li class="fragment">Zwykle jeden projekt na repo</li>
+                <li class="fragment">Niezależne pipeline'y</li>
+                <li class="fragment">Rozdzielone zależności</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 4: Monorepo ≠ Monolit -->
+        <section>
+          <h3>Monorepo ≠ Monolit</h3>
+          <div class="fragment" style="margin: 20px 0;">
+            <img src="https://d33wubrfki0l68.cloudfront.net/472a382d5813062be253893b9d19034bf5cfdd39/43dc9/assets/images/misconception-monorepo-monolith.svg" alt="Monorepo vs Monolith" style="height: 250px;">
+          </div>
+          <ul>
+            <li class="fragment">✅ <strong>Monorepo</strong>: Modułowa struktura z jasno określonymi granicami</li>
+            <li class="fragment">❌ <strong>Monolit</strong>: Brak jasnych granic, silne powiązania, trudne do rozdzielenia</li>
+          </ul>
+          <p class="fragment">Dobry monorepo jest <strong>przeciwieństwem</strong> monolitu!</p>
+        </section>
+
+        <!-- SLIDE 5: Zalety monorepo -->
+        <section>
+          <h3>Zalety monorepo</h3>
+          <ul>
+            <li class="fragment">🔄 <strong>Współdzielenie kodu</strong> - łatwe współdzielenie bibliotek, komponentów i narzędzi</li>
+            <li class="fragment">👁️ <strong>Widoczność</strong> - pełne zrozumienie zmian w całym ekosystemie</li>
+            <li class="fragment">🔀 <strong>Atomic commits</strong> - zmiany w wielu projektach w jednym commicie</li>
+            <li class="fragment">🧩 <strong>Spójne API</strong> - łatwiejsza standaryzacja wzorców i konwencji</li>
+            <li class="fragment">🔍 <strong>Refaktoryzacja</strong> - wszystkie miejsca używające kodu są w jednym miejscu</li>
+            <li class="fragment">📦 <strong>Zarządzanie zależnościami</strong> - ujednolicone wersje, mniej konfliktów</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 6: Wady monorepo -->
+        <section>
+          <h3>Wady monorepo</h3>
+          <ul>
+            <li class="fragment">📈 <strong>Skalowanie</strong> - wyzwania z rozmiarem repozytorium przy dużych projektach</li>
+            <li class="fragment">🐌 <strong>Wydajność CI/CD</strong> - więcej testów, dłuższe buildy bez odpowiednich narzędzi</li>
+            <li class="fragment">🔐 <strong>Kontrola dostępu</strong> - trudniejsze zarządzanie uprawnieniami</li>
+            <li class="fragment">🔧 <strong>Konfiguracja narzędzi</strong> - większa złożoność początkowa</li>
+            <li class="fragment">📚 <strong>Krzywa uczenia</strong> - nowe wzorce dla zespołów przyzwyczajonych do polyrepo</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 7: Kiedy używać monorepo? -->
+        <section>
+          <h3>Kiedy warto używać monorepo?</h3>
+          <ul>
+            <li class="fragment">🏢 Firma z wieloma powiązanymi projektami</li>
+            <li class="fragment">🧩 Aplikacje współdzielące znaczną część kodu lub komponentów</li>
+            <li class="fragment">📚 Ekosystemy z wieloma powiązanymi bibliotekami</li>
+            <li class="fragment">🔄 Full-stack aplikacje (frontend + backend + współdzielone typy)</li>
+            <li class="fragment">📱 Projekty z wieloma platformami (web + mobile + desktop)</li>
+            <li class="fragment">🚀 Startupowe projekty z szybko zmieniającymi się zależnościami</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 8: Kiedy NIE używać monorepo -->
+        <section>
+          <h3>Kiedy NIE używać monorepo?</h3>
+          <ul>
+            <li class="fragment">🏝️ Całkowicie niezależne projekty</li>
+            <li class="fragment">👮 Wymagana ścisła izolacja komponentów (np. ze względów bezpieczeństwa)</li>
+            <li class="fragment">🔧 Brak narzędzi do zarządzania złożonością monorepo</li>
+            <li class="fragment">🧩 Projekty używające bardzo różnych ekosystemów lub języków</li>
+            <li class="fragment">👥 Zespoły pracujące zupełnie niezależnie, bez wspólnej koordynacji</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 9: Narzędzia monorepo -->
+        <section>
+          <h3>Popularne narzędzia monorepo</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>JavaScript/TypeScript</h4>
+              <ul>
+                <li class="fragment">📦 <strong>Nx</strong> - kompleksowe rozwiązanie</li>
+                <li class="fragment">🧰 <strong>npm/yarn/pnpm workspaces</strong> - podstawowe</li>
+                <li class="fragment">🔧 <strong>Lerna</strong> - publikowanie pakietów</li>
+                <li class="fragment">🔄 <strong>Turborepo</strong> - szybkie buildy</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Inne języki/uniwersalne</h4>
+              <ul>
+                <li class="fragment">🏗️ <strong>Bazel</strong> (Google) - wielojęzykowy</li>
+                <li class="fragment">⚡ <strong>Buck</strong> (Facebook) - szybkie buildy</li>
+                <li class="fragment">🔨 <strong>Pants/Please</strong> - dla dużych repozytoriów</li>
+                <li class="fragment">☸️ <strong>Gradle</strong> - wieloprojektowe buildy</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        
+        <!-- SLIDE 10: Nx - Wprowadzenie -->
+        <section>
+          <h3>Nx - zaawansowane narzędzie dla monorepo</h3>
+          <div class="fragment" style="text-align: center; margin: 20px 0;">
+            <img src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png" alt="Nx Logo" style="height: 120px;">
+          </div>
+          <ul>
+            <li class="fragment">🚀 <strong>Smart Build System</strong> - inteligentne odtwarzanie buildów</li>
+            <li class="fragment">🔍 <strong>Dependency Graph</strong> - wizualizacja zależności</li>
+            <li class="fragment">⚡ <strong>Incremental Builds</strong> - budowanie tylko tego, co się zmieniło</li>
+            <li class="fragment">🔄 <strong>Affected Commands</strong> - wykonuj operacje tylko na projektach dotkniętych zmianą</li>
+            <li class="fragment">🧩 <strong>Plugins & Generators</strong> - rozszerzalny ekosystem</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 11: Nx - Przykład -->
+        <section>
+          <h3>Nx - Przykład użycia</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Struktura projektu</h4>
+              <pre><code class="language-text" data-trim>
+myorg/
+├── apps/
+│   ├── shop/             # Aplikacja sklepu
+│   │   ├── src/
+│   │   └── project.json
+│   └── admin/            # Panel administracyjny
+│       ├── src/
+│       └── project.json
+├── libs/
+│   ├── shared/           # Współdzielone komponenty
+│   │   ├── src/
+│   │   └── project.json
+│   └── api-interfaces/   # Wspólne typy TS
+│       ├── src/
+│       └── project.json
+├── tools/                # Skrypty i narzędzia
+├── nx.json               # Konfiguracja Nx
+└── package.json          # Zależności projektu
+              </code></pre>
+            </div>
+            <div class="fragment">
+              <h4>Komendy Nx</h4>
+              <pre><code class="language-bash" data-trim>
+# Utworzenie nowego monorepo
+npx create-nx-workspace@latest myorg
+
+# Dodanie nowej aplikacji
+nx generate @nrwl/react:app shop
+
+# Dodanie nowej biblioteki
+nx generate @nrwl/react:lib ui-components
+
+# Uruchomienie testów w projektach dotkniętych zmianą
+nx affected:test
+
+# Budowanie tylko zmodyfikowanych aplikacji
+nx affected:build
+
+# Wizualizacja grafu zależności
+nx dep-graph
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 12: npm workspaces -->
+        <section>
+          <h3>npm workspaces</h3>
+          <p class="fragment">Proste rozwiązanie monorepo wbudowane w npm (od wersji 7.0)</p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>package.json (root)</h4>
+              <pre><code class="language-json" data-trim>
+{
+  "name": "my-monorepo",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "typescript": "^4.5.0"
+  }
+}
+              </code></pre>
+            </div>
+            <div class="fragment">
+              <h4>Struktura projektu</h4>
+              <pre><code class="language-text" data-trim>
+my-monorepo/
+├── package.json        # Root package.json
+├── packages/
+│   ├── app/
+│   │   ├── package.json
+│   │   └── src/
+│   ├── ui-library/
+│   │   ├── package.json
+│   │   └── src/
+│   └── utils/
+│       ├── package.json
+│       └── src/
+└── node_modules/       # Współdzielone zależności
+              </code></pre>
+            </div>
+          </div>
+          <div class="fragment">
+            <p>Lokalne zależności:</p>
+            <pre><code class="language-json" data-trim>
+// W packages/app/package.json
+{
+  "name": "app",
+  "dependencies": {
+    "ui-library": "workspace:*",
+    "utils": "workspace:*"
+  }
+}
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- SLIDE 13: npm workspaces vs Nx -->
+        <section>
+          <h3>npm workspaces vs Nx</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Cechy</th>
+                <th>npm workspaces</th>
+                <th>Nx</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="fragment">
+                <td>Instalacja zależności</td>
+                <td>✅ Wbudowana hoisting</td>
+                <td>✅ Pełna obsługa</td>
+              </tr>
+              <tr class="fragment">
+                <td>Lokalne zależności</td>
+                <td>✅ Podstawowa obsługa</td>
+                <td>✅ Zaawansowana obsługa</td>
+              </tr>
+              <tr class="fragment">
+                <td>Incremental builds</td>
+                <td>❌ Brak</td>
+                <td>✅ Wbudowane</td>
+              </tr>
+              <tr class="fragment">
+                <td>Caching</td>
+                <td>❌ Brak</td>
+                <td>✅ Lokalny i zdalny cache</td>
+              </tr>
+              <tr class="fragment">
+                <td>Dependency graph</td>
+                <td>❌ Brak</td>
+                <td>✅ Interaktywny</td>
+              </tr>
+              <tr class="fragment">
+                <td>Affected commands</td>
+                <td>❌ Brak</td>
+                <td>✅ Wbudowane</td>
+              </tr>
+              <tr class="fragment">
+                <td>Generatory kodu</td>
+                <td>❌ Brak</td>
+                <td>✅ Rozbudowane</td>
+              </tr>
+              <tr class="fragment">
+                <td>Złożoność</td>
+                <td>✅ Niska</td>
+                <td>⚠️ Średnia/Wysoka</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SLIDE 14: Przykładowe monorepo w praktyce -->
+        <section>
+          <h3>Przykładowe monorepo w praktyce</h3>
+          <ul>
+            <li class="fragment">🌐 <strong>Google</strong> - jedno z największych monorepo na świecie (86TB)</li>
+            <li class="fragment">📱 <strong>Microsoft</strong> - monorepo dla aplikacji Office</li>
+            <li class="fragment">📘 <strong>Facebook/Meta</strong> - główne aplikacje i narzędzia</li>
+            <li class="fragment">🐦 <strong>Twitter</strong> - główna platforma</li>
+            <li class="fragment">🧩 <strong>Babel</strong> - modularny system wtyczek</li>
+            <li class="fragment">⚛️ <strong>React</strong> - biblioteka i narzędzia</li>
+            <li class="fragment">🔄 <strong>Angular</strong> - framework i narzędzia</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 15: Typowe problemy i rozwiązania -->
+        <section>
+          <h3>Typowe problemy i rozwiązania</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Problem</th>
+                <th>Rozwiązanie</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="fragment">
+                <td>Powolne CI/CD</td>
+                <td>Incremental builds, caching, parallel execution</td>
+              </tr>
+              <tr class="fragment">
+                <td>Konfliktujące zależności</td>
+                <td>Hoisting, peer dependencies, workspace resolution</td>
+              </tr>
+              <tr class="fragment">
+                <td>Kontrola dostępu</td>
+                <td>CODEOWNERS, granularne uprawnienia w CI</td>
+              </tr>
+              <tr class="fragment">
+                <td>Zbyt duże repozytorium</td>
+                <td>Sparse checkout, git LFS, shallow clones</td>
+              </tr>
+              <tr class="fragment">
+                <td>Niejednostki stylu kodu</td>
+                <td>Wspólne eslint/prettier, łatwe egzekwowanie reguł</td>
+              </tr>
+              <tr class="fragment">
+                <td>Wersjonowanie pakietów</td>
+                <td>Conventional commits, Lerna, automated releases</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SLIDE 16: Best Practices -->
+        <section>
+          <h3>Best Practices w monorepo</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Strukturalne</h4>
+              <ul>
+                <li class="fragment">📁 Jasna organizacja folderów</li>
+                <li class="fragment">🧩 Modularyzacja kodu</li>
+                <li class="fragment">📚 Prawidłowe zarządzanie zależnościami</li>
+                <li class="fragment">📝 Dobrze zdefiniowane API między projektami</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Procesowe</h4>
+              <ul>
+                <li class="fragment">🔄 Automatyzacja CI/CD</li>
+                <li class="fragment">📊 Monitoring wydajności buildów</li>
+                <li class="fragment">🔒 Kontrola jakości kodu</li>
+                <li class="fragment">📈 Standardy dla wszystkich projektów</li>
+                <li class="fragment">🗂️ Dokumentacja konwencji</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- SLIDE 17: Wnioski -->
+        <section>
+          <h3>Wnioski</h3>
+          <ul>
+            <li class="fragment">🧩 Monorepo to <strong>podejście organizacyjne</strong>, nie technologia</li>
+            <li class="fragment">⚖️ Korzyści rosną wraz ze <strong>współdzieleniem kodu</strong> i integracją projektów</li>
+            <li class="fragment">🛠️ Dobre <strong>narzędzia</strong> są kluczowe dla powodzenia</li>
+            <li class="fragment">🔄 Są <strong>tradeoffs</strong> - nie ma jednego rozwiązania dla wszystkich</li>
+            <li class="fragment">📈 Wymagane jest <strong>świadome zarządzanie</strong> złożonością</li>
+          </ul>
+        </section>
+
+        <!-- SLIDE 18: Zasoby -->
+        <section>
+          <h3>Zasoby i dokumentacja</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
+            <div>
+              <h4>Narzędzia</h4>
+              <ul>
+                <li><a href="https://nx.dev" target="_blank">
+                  📚 Nx - Oficjalna dokumentacja
+                </a></li>
+                <li><a href="https://docs.npmjs.com/cli/v7/using-npm/workspaces" target="_blank">
+                  📚 npm workspaces - Dokumentacja
+                </a></li>
+                <li><a href="https://turborepo.org" target="_blank">
+                  📚 Turborepo - Dokumentacja
+                </a></li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h4>Materiały edukacyjne</h4>
+              <ul>
+                <li><a href="https://monorepo.tools" target="_blank">
+                  🔗 monorepo.tools - Przewodnik po monorepo
+                </a></li>
+                <li><a href="https://nx.dev/getting-started/intro" target="_blank">
+                  🎓 Nx - Tutoriale i przewodniki
+                </a></li>
+                <li><a href="https://github.com/korfuri/awesome-monorepo" target="_blank">
+                  📚 Awesome Monorepo - Zbiór zasobów
+                </a></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Core libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/protobuf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/reveal.min.js"></script>
+
+    <!-- Reveal.js plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/notes/notes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/search/search.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/zoom/zoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.4.0/plugin/highlight/highlight.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        try {
+          // Initialize highlight.js
+          hljs.configure({ languages: ["javascript", "bash", "yaml", "json", "protobuf"] });
+          hljs.highlightAll();
+
+          // Initialize Reveal
+          let deck = new Reveal({
+            hash: true,
+            transition: "convex",
+            plugins: [RevealNotes, RevealSearch, RevealZoom],
+            slideNumber: "c/t",
+            pdfSeparateFragments: false,
+            highlight: {
+              highlightOnLoad: true,
+            },
+          });
+
+          deck.initialize();
+        } catch (error) {
+          console.error("Initialization error:", error);
+        }
+      });
+    </script>
+  </body>
+</html>
