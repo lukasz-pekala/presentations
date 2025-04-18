@@ -6,7 +6,7 @@
     "start": "live-server"
   },
   "dependencies": {
-    "reveal.js": "4.6.1",
+    "reveal.js": "5.2.1",
     "highlight.js": "11.11.1"
   },
   "devDependencies": {
