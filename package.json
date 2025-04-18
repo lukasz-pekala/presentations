@@ -1,7 +1,7 @@
 {
-  "name": "nestjs-presentations",
+  "name": "presentations",
   "version": "1.0.0",
-  "description": "NestJS Presentations using reveal.js",
+  "description": "Presentations on various topics, created using reveal.js and LLMs",
   "scripts": {
     "start": "live-server",
     "pdf": "decktape reveal gRPC-tRPC-NestJS.html presentation.pdf --size 1920x1080"
