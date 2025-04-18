@@ -3,13 +3,13 @@
   "version": "1.0.0",
   "description": "Presentations on various topics, created using reveal.js and LLMs",
   "scripts": {
-    "start": "live-server",
-    "pdf": "decktape reveal gRPC-tRPC-NestJS.html presentation.pdf --size 1920x1080"
+    "start": "live-server"
   },
   "dependencies": {
-    "reveal.js": "^4.4.0"
+    "reveal.js": "4.6.1",
+    "highlight.js": "11.11.1"
   },
   "devDependencies": {
-    "decktape": "^3.5.0"
+    "live-server": "^1.2.2"
   }
 }
