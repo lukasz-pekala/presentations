@@ -486,7 +486,44 @@ my-monorepo/
           </table>
         </section>
 
-        <!-- SLIDE 15: Przykładowe monorepo w praktyce -->
+        <!-- SLIDE 15: Problem hoistingu i leaky dependencies -->
+        <section>
+          <h3>Hoisting i "leaky dependencies" w monorepo</h3>
+          <div class="fragment" style="margin: 10px 0;">
+            <img src="https://d33wubrfki0l68.cloudfront.net/d974af819b4f78b15feb3232ae3f6b14a4933b3d/6f254/assets/images/hoisted-packages.svg" alt="Node modules hoisting" style="height: 150px;">
+          </div>
+          <p class="fragment"><strong>Hoisting</strong>: Przenoszenie zależności do głównego node_modules w celu deduplikacji</p>
+          <p class="fragment"><strong>"Leaky dependencies"</strong>: Niedeklarowane zależności działające "przez przypadek"</p>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Narzędzie</th>
+                <th>Podejście do problemu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="fragment">
+                <td>npm workspaces</td>
+                <td>⚠️ Stosuje hoisting domyślnie, ryzyko leaky dependencies</td>
+              </tr>
+              <tr class="fragment">
+                <td>Lerna</td>
+                <td>⚠️ Korzysta z mechanizmu npm/yarn, te same problemy</td>
+              </tr>
+              <tr class="fragment">
+                <td>Nx</td>
+                <td>✅ Narzędzia do wykrywania nieprawidłowych zależności</td>
+              </tr>
+              <tr class="fragment">
+                <td>pnpm</td>
+                <td>✅ Symlinki i ścisła izolacja pakietów</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- SLIDE 16: Przykładowe monorepo w praktyce -->
         <section>
           <h3>Przykładowe monorepo w praktyce</h3>
           <ul>
@@ -500,7 +537,7 @@ my-monorepo/
           </ul>
         </section>
 
-        <!-- SLIDE 16: Typowe problemy i rozwiązania -->
+        <!-- SLIDE 17: Typowe problemy i rozwiązania -->
         <section>
           <h3>Typowe problemy i rozwiązania</h3>
           <table>
@@ -539,7 +576,7 @@ my-monorepo/
           </table>
         </section>
 
-        <!-- SLIDE 17: Best Practices -->
+        <!-- SLIDE 18: Best Practices -->
         <section>
           <h3>Best Practices w monorepo</h3>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
@@ -565,7 +602,7 @@ my-monorepo/
           </div>
         </section>
 
-        <!-- SLIDE 18: Wnioski -->
+        <!-- SLIDE 19: Wnioski -->
         <section>
           <h3>Wnioski</h3>
           <ul>
@@ -577,7 +614,7 @@ my-monorepo/
           </ul>
         </section>
 
-        <!-- SLIDE 19: Zasoby -->
+        <!-- SLIDE 20: Zasoby -->
         <section>
           <h3>Zasoby i dokumentacja</h3>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px">
